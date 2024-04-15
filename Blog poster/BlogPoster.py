@@ -1,4 +1,6 @@
 import requests
+import os
+from urllib.request import urlretrieve
 from bs4 import BeautifulSoup
 from docx import Document
 
@@ -34,7 +36,19 @@ def scrape_and_store_data(url):
     
     # Add the blog content as the document content
     document.add_paragraph(blog_content)
-    
+
+    # Extracting the blog images
+    images = soup.find_all('img')
+    for i, img in enumerate(images):
+        img_url = img.get('src')
+        if img_url.startswith('http'):
+            try:
+                # Download and save the image
+                img_filename = f'{blog_title}_{i}.jpg'
+                urlretrieve(img_url, img_filename)
+            except Exception as e:
+                print(f'Error downloading image: {e}')
+        
     # Save the document as a Word file
     document.save(f'{blog_title}.docx')
 
